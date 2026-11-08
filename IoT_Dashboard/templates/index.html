@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IoT 环境监控控制台</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-icon">⌁</span><span>智联物控</span></div>
+      <div class="side-label">工作空间</div>
+      <a class="nav-item active" href="/"><span>▦</span> 环境总览</a>
+      <a class="nav-item" href="#devices"><span>◉</span> 设备状态</a>
+      <a class="nav-item" href="#settings"><span>⚙</span> 参数设置</a>
+      <div class="sidebar-bottom">
+        <div class="online-dot"></div>
+        <div><strong>系统在线</strong><small>演示环境 · Flask</small></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">INTERNET OF THINGS / DASHBOARD</div>
+          <h1>环境监控中心</h1>
+          <p class="subtitle">实时查看环境数据，并远程调整设备运行目标。</p>
+        </div>
+        <div class="top-actions"><span class="live-pill"><i></i> 实时监测</span><div class="avatar">IoT</div></div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <section class="section-heading" id="devices">
+        <div><h2>环境数据</h2><p>传感器当前采集结果</p></div>
+        <span class="update-time">最后更新：{{ data.updated_at }}</span>
+      </section>
+
+      <section class="metrics">
+        <article class="metric-card temperature">
+          <div class="metric-top"><span class="metric-icon">♨</span><span class="metric-tag">温度传感器</span></div>
+          <div class="metric-label">当前温度</div>
+          <div class="metric-value">{{ "%.1f"|format(data.temperature) }}<small>℃</small></div>
+          <div class="metric-foot"><span class="status-mark">●</span> 数据采集正常</div>
+          <div class="metric-decoration"></div>
+        </article>
+        <article class="metric-card humidity">
+          <div class="metric-top"><span class="metric-icon">◌</span><span class="metric-tag">湿度传感器</span></div>
+          <div class="metric-label">当前湿度</div>
+          <div class="metric-value">{{ "%.1f"|format(data.humidity) }}<small>%</small></div>
+          <div class="metric-foot"><span class="status-mark">●</span> 数据采集正常</div>
+          <div class="humidity-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </article>
+        <article class="metric-card target">
+          <div class="metric-top"><span class="metric-icon">⌖</span><span class="metric-tag">控制参数</span></div>
+          <div class="metric-label">目标温度</div>
+          <div class="metric-value">{{ "%.1f"|format(target_temperature) }}<small>℃</small></div>
+          <div class="metric-foot"><span class="status-mark">●</span> 控制目标已设定</div>
+          <div class="target-ring"></div>
+        </article>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel control-panel" id="settings">
+          <div class="panel-heading"><div><h2>温度控制</h2><p>设置设备期望达到的环境温度</p></div><span class="panel-icon">⚙</span></div>
+          <form action="/set-temperature" method="POST" class="control-form">
+            <label for="target_temperature">目标温度设定 <span>范围 -20 至 60 ℃</span></label>
+            <div class="input-row">
+              <input type="number" name="target_temperature" id="target_temperature" step="0.1" min="-20" max="60" placeholder="例如：26.0" required>
+              <span class="unit">℃</span>
+              <button type="submit">应用设置 <b>→</b></button>
+            </div>
+          </form>
+          <div class="control-note"><span>ⓘ</span> 提交后，系统将更新目标温度并在本页面显示。</div>
+        </article>
+
+        <article class="panel status-panel">
+          <div class="panel-heading"><div><h2>设备运行状态</h2><p>当前系统连接概况</p></div><span class="healthy">运行正常</span></div>
+          <div class="status-row"><span class="status-symbol blue">⌁</span><div><strong>环境传感器</strong><small>温度 / 湿度数据源</small></div><span class="connected">已连接</span></div>
+          <div class="status-row"><span class="status-symbol violet">⌘</span><div><strong>控制模块</strong><small>目标温度参数</small></div><span class="connected">工作中</span></div>
+          <div class="status-row"><span class="status-symbol green">◷</span><div><strong>Web 服务</strong><small>Flask 应用服务</small></div><span class="connected">在线</span></div>
+        </article>
+      </section>
+      <footer>IoT Dashboard <span>·</span> Flask Demo <span>·</span> 当前数据为模拟传感器数据</footer>
+    </main>
+  </div>
+</body>
+</html>
